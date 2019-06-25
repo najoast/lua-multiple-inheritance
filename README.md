@@ -34,7 +34,9 @@ end
 5. 代码简洁，不到40行代码，容易维护，定制也方便
 
 
+# References
 > https://en.wikipedia.org/wiki/Multiple_inheritance
-https://www.geeksforgeeks.org/multiple-inheritance-in-c/
-https://www.lua.org/pil/16.3.html
-http://lua-users.org/wiki/MultipleInheritanceClasses
+> https://www.geeksforgeeks.org/multiple-inheritance-in-c/
+> https://www.lua.org/pil/16.3.html
+> http://lua-users.org/wiki/MultipleInheritanceClasses
+> https://blog.codingnow.com/cloud/LuaOO
