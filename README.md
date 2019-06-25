@@ -8,9 +8,11 @@
 3. delete 按 C++ 顺序自动调用 dtor
 4. 多继承时几乎不会有太多同名方法的 overwrite, 所以不太在乎 The diamond problem
 
-代码是基于原有的单继承版本，这个版本也是基于云风的实现做了微调，主要思想就是把类的 __index 元方法由之前的 super 改为函数，在这个函数内遍历所有父类，去找想要找的字段，这里不用担心性能问题，因为父类一般不会太多，找到后也不要做缓存，否则当热更了基类函数后，派生类不会变化，没必要为了这一点性能开销而做出这种牺牲。
+代码是基于原有的单继承版本，这个版本也是基于云风的实现做了微调，主要思想就是把类的 __index 元方法由之前的直接使用 super 表改为函数，在这个函数内遍历所有父类，去找想要找的字段，这里不用担心性能问题，因为父类一般不会太多，找到后也不要做缓存，否则当热更了基类函数后，派生类不会变化，没必要为了这一点性能开销而做出这种牺牲。
 
-最后 `new` 函数基本就是云风的代码，只改成遍历 super 类了，这里需要注意的是要把执行过了构造函数标记一下，不能重复执行，否则当出现`菱形继承`时，共同基类的构造会被调用多次，而这是我们不希望看到的。Lua 的对象不像 C++ 那样里面包含有整个继承体系里所有类的实例，再由这些实例组成一个大的实例，Lua 就是一个表而已，类的函数都是通过元表来访问的，可以理解为 Lua 里类的实例就只是最终派生类的实例，不含有基类实例，这样其实就天生避免了很多问题，不像 C++ 还要虚继承才能避免多基类实例问题。
+最后 `cls.new` 函数基本就是云风的代码，只改成遍历 super 类了，这里需要注意的是要把执行过了构造函数标记一下，不能重复执行，否则当出现`菱形继承`时，共同基类的构造会被调用多次，而这是我们不希望看到的。Lua 的对象不像 C++ 那样里面包含有整个继承体系里所有类的实例，再由这些实例组成一个大的实例，Lua 就是一个表而已，类的函数都是通过元表来访问的，可以理解为 Lua 里类的实例就只是最终派生类的实例，不含有基类实例，这样其实就天生避免了很多问题，不像 C++ 还要虚继承才能避免多基类实例问题。
+
+还有两个仿 C++ 语法的 `new() & delete()`, 其中 `new` 只是个语法糖，没有任何代码。`delete` 则是必须的，是为了满足“按顺序执行 `dtor`” 这个需求而实现的。
 
 # The diamond problem
 The "diamond problem" (sometimes referred to as the "Deadly Diamond of Death"[4]) is an ambiguity that arises when two classes B and C inherit from A, and class D inherits from both B and C. If there is a method in A that B and C have overridden, and D does not override it, then which version of the method does D inherit: that of B, or that of C?
