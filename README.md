@@ -1,6 +1,12 @@
 
 # 说明
-最近项目里有个模块的继承体系比较复杂，需要用到多继承，找了下目前已有的实现，都不是很满意，要么代码量太多不知所云，要么就是太简单不能满足现有需求，于是干脆就自己重新写一个，因为目前我们项目里正在用的`class`函数就是我写的，所以重新写一个并不难。
+最近项目里有个模块的继承体系比较复杂，需要用到多继承，找了下目前已有的实现，都不是很满意，要么代码量太多不知所云，要么就是太简单不能满足现有需求，于是干脆就自己重新写一个。
+
+我们的需求：
+1. 支持多继承
+2. new 按 C++ 顺序自动调用 ctor
+3. delete 按 C++ 顺序自动调用 dtor
+4. 多继承时几乎不会有太多同名方法的 overwrite, 所以不太在乎 The diamond problem
 
 代码是基于原有的单继承版本，这个版本也是基于云风的实现做了微调，主要思想就是把类的 __index 元方法由之前的 super 改为函数，在这个函数内遍历所有父类，去找想要找的字段，这里不用担心性能问题，因为父类一般不会太多，找到后也不要做缓存，否则当热更了基类函数后，派生类不会变化，没必要为了这一点性能开销而做出这种牺牲。
 
@@ -21,9 +27,9 @@ end
 这里用的是 super[k], 而不是 rawget(super, k), 也就是说会先顺着一条线找到底，找不到才会从下一个 super 那条线找。
 
 为什么这么写，而不是先遍历所有爸爸，再遍历爷爷呢？  
-很简单，因为这样代码好写，试想下代码要怎么写才能达到上述效果，使用 rawget 先遍历一遍，找不到怎么办？不好意思，开始遍历爷爷，先通过 supers 字段取出爷爷们，再遍历他们，还要去重，这是一个 O(n*n) 的循环，等于是做了 lua 底层帮我们做的事，费了半天劲，最后得到一个奇丑无比的代码，实现了一个伪需求。
+很简单，因为这样代码好写，试想下代码要怎么写才能达到先遍历所有爸爸再遍历所有爷爷的效果，使用 rawget 先遍历一遍，找不到怎么办？不好意思，开始遍历爷爷，先通过 supers 字段取出爷爷们，再遍历他们，还要去重，这是一个 O(n*n) 的循环，等于是做了 lua 底层帮我们做的事，费了半天劲，最后得到一个奇丑无比的代码，实现了一个伪需求。
 
-所以我是不打算这样做的，如果你们项目有这个需求，就自己实现吧，本来 Lua 的 OO 就是模拟出来的，可以灵活的根据项目定制，我们不是要造一个 100% 完备的 OO 机制出来，而是要一个足够简洁，刚好够用的 OO。
+所以我是不打算这样做的，如果你们有这个需求就自己实现吧，本来 Lua 的 OO 就是模拟出来的，可以灵活的根据项目定制，我们不是要造一个 100% 完备的 OO 机制出来，而是要一个足够简洁，刚好够用的 OO。
 
 # Features
 总结下这个 class 的特性
@@ -35,8 +41,8 @@ end
 
 
 # References
-> https://en.wikipedia.org/wiki/Multiple_inheritance
-> https://www.geeksforgeeks.org/multiple-inheritance-in-c/
-> https://www.lua.org/pil/16.3.html
-> http://lua-users.org/wiki/MultipleInheritanceClasses
-> https://blog.codingnow.com/cloud/LuaOO
+> https://en.wikipedia.org/wiki/Multiple_inheritance  
+> https://www.geeksforgeeks.org/multiple-inheritance-in-c  
+> https://www.lua.org/pil/16.3.html  
+> http://lua-users.org/wiki/MultipleInheritanceClasses  
+> https://blog.codingnow.com/cloud/LuaOO  
