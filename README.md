@@ -16,6 +16,7 @@
 
 # The diamond problem
 The "diamond problem" (sometimes referred to as the "Deadly Diamond of Death"[4]) is an ambiguity that arises when two classes B and C inherit from A, and class D inherits from both B and C. If there is a method in A that B and C have overridden, and D does not override it, then which version of the method does D inherit: that of B, or that of C?
+![The diamond problem](https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Diamond_inheritance.svg/800px-Diamond_inheritance.svg.png)
 
 关于这个问题，我们的处理方法比较简单，先找到哪个就用哪个：
 ```lua
